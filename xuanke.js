@@ -12,9 +12,9 @@ var success_count = 0;
 var qk_count = 0;
 var s = document.createElement("script");
 s.setAttribute("src","https://cdn.bootcss.com/cookie.js/1.2.2/cookie.min.js");
-$('#savetable-btn').before('<input type="button" name="button" id="qk-btn" onclick="saveList()" value="存档">' +
-    '<input type="button" name="button" id="qk-btn" onclick="loadList()" value="读档">' +
-    '<input type="button" name="button" id="qk-btn" onclick="addToqk()" value="加入抢课列表">');
+$('#plancourse-btn').after('<input type="button" name="button" id="qk-btn" onclick="saveList()" value="存档">' +
+    '<input type="button" name="button" id="qk-btn" onclick="loadList()" value="读档">');
+$('#savetable-btn').before('<input type="button" name="button" id="qk-btn" onclick="addToqk()" value="加入抢课列表">');
 $('#courseTable').after('<div id="qk-list-bar">抢课列表<table class="data-table" id="qk-list"><thead><tr><th>课程名称</th><th>教师</th><th>上课时间</th><th>状态</th><th>操作面板</th></tr></thead></table></div>')
 $('#notice').remove();
 $('#op-area').before('<div id="qk-bar"><span>DuStark 抢课脚本 </span><input type="button" name="button" id="qk-btn" onclick="changeqk()" value="开始抢课">' +
