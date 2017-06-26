@@ -129,6 +129,7 @@ function qk() {
         isqk = false;
         $('#qk-btn').val("开始抢课");
         console.log("恭喜，全部课程抢课成功，系统自动停止抢课！");
+        $('#newest').text("恭喜，全部课程抢课成功，系统自动停止抢课！");
         $('#qk-interval').attr("disabled", false);
         $('.pre').attr("disabled",false);
         return;
