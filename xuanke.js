@@ -11,7 +11,9 @@ var interval = 3000;
 var selected_count = 0;
 var success_count = 0;
 var qk_count = 0;
+window.alert = function(){}
 var s = document.createElement("script");
+$('html').css("font-family",'PingFang SC',"微软雅黑");
 $('#plancourse-btn').after('<input type="button" name="button" id="qk-btn" onclick="saveList()" value="存档">' +
     '<input type="button" name="button" id="qk-btn" onclick="loadList()" value="读档">');
 $('#savetable-btn').before('<input type="button" name="button" id="qk-btn" onclick="addToqk()" value="加入抢课列表">');
@@ -22,14 +24,6 @@ $('#op-area').before('<div id="qk-bar"><span>DuStark 抢课脚本 </span><input 
     '当前已尝试抢课<span id="qk_count">0</span>次,已抢到<span id="success_count" style="color:green">' +
     '0</span>/<span id="selected_count">0</span>节课。最新：<span id="newest" style="color:red">DuStark 抢课加载完毕。</span></span></div>');
 s.onload = function(){
-
-    // for(var i=0;i<100;i++){
-    //     setTimeout(function(){
-    //         $('a[action-type="fl_menu"]')[0].click();
-    //         $('a[title="删除此条微博"]')[0].click();
-    //         $('a[action-type="ok"]')[0].click();
-    //     },1000*i);
-    // }
 }
 document.head.appendChild(s);
 
@@ -47,7 +41,7 @@ function addToqk() {
 
         if (!isSelected) {
             console.log("已将" + lessonname + "下的课程" + classnumber + "(" + teachername + ")加入抢课列表。\n" + classtime);
-            alert("已将" + lessonname + "下的课程" + classnumber + "(" + teachername + ")加入抢课列表。\n" + classtime);
+            confirm("已将" + lessonname + "下的课程" + classnumber + "(" + teachername + ")加入抢课列表。\n" + classtime);
             selected.push({
                 "lessonid": lessonid,
                 "classid": classid,
@@ -63,10 +57,10 @@ function addToqk() {
             refreshList();
         } else {
             console.log(lessonname + "下的课程" + classnumber + "(" + teachername + ")添加失败。已经选课成功。");
-            alert(lessonname + "下的课程" + classnumber + "(" + teachername + ")添加失败。已经选课成功。");
+            confirm(lessonname + "下的课程" + classnumber + "(" + teachername + ")添加失败。已经选课成功。");
         }
     } else {
-        alert("没有选中任何目标课程。");
+        confirm("没有选中任何目标课程。");
     }
 }
 
@@ -76,7 +70,7 @@ function refreshList() {
         var l = selected[i];
         var s = "<tr class='"+(l['state']==="正在抢课"?"":"red")+"'><td>"+l['lessonname']+"</td><td>"+l['teachername']+"</td>" +
             "<td>"+l['classtime']+"</td><td>"+l['state']+"</td><td><a href='javascript:' onclick='cancelqk("+i+")'>取消抢课</a> " +
-            "<span> 序列:</span><input type='number' style='width:25px' class='pre' id='pre-"+selected[i]["classnumber"]+"' value='"+selected[i]["pre"]+"'></td></tr>"
+            "<span> 序列:</span><input style='width:30px' class='pre' id='pre-"+selected[i]["classnumber"]+"' value='"+selected[i]["pre"]+"'></td></tr>"
         $('#qk-list').append(s);
     }
 }
@@ -97,7 +91,7 @@ function changeqk() {
         lessons = {};
         $('.pre').attr("disabled", true);
         for (var i = 0; i < selected.length; i++) {
-            selected[i]["pre"] = $('#pre-'+selected[i]["classnumber"]).val();
+            selected[i]["pre"] = parseInt($('#pre-'+selected[i]["classnumber"]).val());
         }
         for (var i = 0; i < selected.length; i++) {
             if (lessons[selected[i]["pre"]]) {
@@ -137,9 +131,10 @@ function qk() {
 
     var lessons_count = Object.keys(lessons).length;
     if (lessons[0] && lessons[0].length>0) lessons_count--;
-    console.log("count:"+lessons_count);
+    //console.log("count:"+lessons_count);
     var subinterval = interval / ((lessons_count>0)?lessons_count:1);
     qk_count++;
+    console.log("正在进行第"+qk_count+"次抢课尝试。");
 
 
     $('#qk_count').text(qk_count);
@@ -149,7 +144,7 @@ function qk() {
         qking(0, interval);
     } else {
         for (var pre in lessons) {
-            if (pre !== 0) {
+            if (pre != 0) {
                 setqk(pre, subinterval, timeout = timeout + subinterval)
             }
         }
@@ -169,7 +164,7 @@ function qking(pre, subinterval) {
     var newclass = false;
     if (pre !== 0) {
         var s = lessons[pre];
-        for (var i in pre) {
+        for (var i in s) {
             var l = s[i];
             if (l["state"] !== "正在抢课") continue;
             window.teachClassTable.refresh(l["lessonid"]);
@@ -181,14 +176,14 @@ function qking(pre, subinterval) {
                 $('#success_count').text(success_count);
                 $('#newest').text(l['lessonname'] + '-' + l['teachername'] + "选课成功。");
             } else {
-                window.electCourseTable.showLessonOnTable(l["classid"], true);
+                window.electCourseTable.showLessonOnTable(parseInt(l["classid"]), true);
                 newclass = true;
             }
         }
     }
     if (lessons[0]) {
         s = lessons[0];
-        for (var i in pre) {
+        for (var i in s) {
             var l = s[i];
             if (l["state"]!=="正在抢课") continue;
             window.teachClassTable.refresh(l["lessonid"]);
@@ -200,13 +195,16 @@ function qking(pre, subinterval) {
                 $('#success_count').text(success_count);
                 $('#newest').text(l['lessonname']+'-'+l['teachername']+"选课成功。");
             } else {
-                window.electCourseTable.showLessonOnTable(l["classid"],true);
+                window.electCourseTable.showLessonOnTable(parseInt(l["classid"]),true);
                 newclass = true;
             }
         }
     }
     if (newclass) {
-        $('#savetable-btn').click();
+        setTimeout(function () {
+            $('#savetable-btn').click();
+        }, subinterval / 4);
+
         setTimeout(function () {
             $('#cboxClose').click();
         }, subinterval / 2);
@@ -221,7 +219,7 @@ function saveList(){
     console.log(str);
     setCookie('selected', str);
     setCookie('interval', interval);
-    alert("存档成功。");
+    confirm("存档成功。");
 }
 
 function loadList() {
