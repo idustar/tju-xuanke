@@ -11,6 +11,7 @@ var interval = 3000;
 var selected_count = 0;
 var success_count = 0;
 var qk_count = 0;
+var request_add = 'http://4m3.tongji.edu.cn/eams/tJStdElectCourse!queryStdCount.action?profileId='+window.location.href.substr(window.location.href.length-4,4);
 window.alert = function(){}
 var s = document.createElement("script");
 $('html').css("font-family",'PingFang SC',"微软雅黑");
@@ -31,11 +32,15 @@ function addToqk() {
     if ($('.lessonAtRightAndLeft')[0] && $('.lessonAtRightAndLeft')[1]) {
         var lesson = $('.lessonAtRightAndLeft')[0];
         var mclass = $('.lessonAtRightAndLeft')[1];
-        var lessonid = $(lesson).attr("id");
-        var classid = $(mclass).attr("id");
         var lessonname = $($(lesson).children("td")[1]).html();
+        var lessonid = parseInt($(lesson).attr("id"));
+        var classid = parseInt($(mclass).attr("id"));
         var classnumber = $($(mclass).children("td")[0]).html();
         var teachername = $($(mclass).children("td")[1]).html();
+        if (teachername == "代码") {
+            confirm("没有选中任何目标课程。");
+            return;
+        }
         var classtime = $($(mclass).children("td")[5]).html();
         var isSelected = $(mclass).hasClass('red');
 
@@ -49,6 +54,7 @@ function addToqk() {
                 "classnumber": classnumber,
                 "teachername": teachername,
                 "classtime": classtime,
+                "form": 0,
                 "state": "正在抢课",
                 "pre": 0
             });
@@ -69,8 +75,7 @@ function refreshList() {
     for (var i in selected) {
         var l = selected[i];
         var s = "<tr class='"+(l['state']==="正在抢课"?"":"red")+"'><td>"+l['lessonname']+"</td><td>"+l['teachername']+"</td>" +
-            "<td>"+l['classtime']+"</td><td>"+l['state']+"</td><td><a href='javascript:' onclick='cancelqk("+i+")'>取消抢课</a> " +
-            "<span> 序列:</span><input style='width:30px' class='pre' id='pre-"+selected[i]["classnumber"]+"' value='"+selected[i]["pre"]+"'></td></tr>"
+            "<td>"+l['classtime']+"</td><td>"+l['state']+"</td><td><a href='javascript:' onclick='cancelqk("+i+")'>取消抢课</a></td></tr>"
         $('#qk-list').append(s);
     }
 }
@@ -159,6 +164,24 @@ function setqk(pre, subinterval, timeout) {
     }, timeout);
 }
 
+function refreshRemain() {
+    $.getScript("http://4m3.tongji.edu.cn/eams/tJStdElectCourse!queryStdCount.action?profileId=4023");
+    var flag = false;
+    for (var i in selected) {
+        if (selected[i]["form"] == 1)
+            selected[i]["form"] = 0;
+        if (selected[i]["form"] < 2) {
+            if (lessonId2Counts[""+selected[i].lessonid].tc > 0) {
+                selected[i] = 1;
+                flag = true;
+            }
+        }
+    }
+    if (flag) {
+
+    }
+}
+
 function qking(pre, subinterval) {
     var newevent = false;
     var newclass = false;
@@ -170,6 +193,7 @@ function qking(pre, subinterval) {
             window.teachClassTable.refresh(l["lessonid"]);
             if ($('#' + l["classid"]).hasClass("red")) {
                 selected[i]["state"] = "已抢到 " + new Date().toLocaleTimeString();
+                selected[i]["form"] = 2;
                 newevent = true;
                 console.log(l['lessonname'] + '-' + l['teachername'] + "选课成功。");
                 success_count++;
