@@ -6,9 +6,11 @@
 在浏览器控制台输入以下内容:
 
 ``
+
 s = document.createElement("script");
 s.setAttribute("src","https://idustar.github.io/tju-xuanke/xuanke.js");
 document.head.appendChild(s); 
+
 ``
 
 ## 注意事项
