@@ -7,9 +7,7 @@
 
 `
 s = document.createElement("script");
-
 s.setAttribute("src","https://idustar.github.io/tju-xuanke/xuanke.js");
-
 document.head.appendChild(s); 
 `
 
